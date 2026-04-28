@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <rect width="800" height="800" fill="#eff6ff"/>
+  <rect x="240" y="160" width="240" height="400" rx="20" fill="none" stroke="#93c5fd" stroke-width="6"/>
+  <rect x="258" y="178" width="204" height="364" rx="14" fill="#bfdbfe" opacity="0.3"/>
+  <rect x="258" y="178" width="204" height="364" rx="14" fill="none" stroke="#60a5fa" stroke-width="3"/>
+  <ellipse cx="360" cy="160" rx="120" ry="20" fill="#93c5fd" opacity="0.5"/>
+  <ellipse cx="360" cy="560" rx="120" ry="22" fill="#93c5fd" opacity="0.7"/>
+  <line x1="300" y1="200" x2="310" y2="550" stroke="white" stroke-width="8" opacity="0.5"/>
+  <line x1="330" y1="185" x2="340" y2="555" stroke="white" stroke-width="4" opacity="0.3"/>
+  <text x="360" y="640" text-anchor="middle" font-family="sans-serif" font-size="26" fill="#1e3a8a" font-weight="bold">双层玻璃杯</text>
+  <text x="360" y="674" text-anchor="middle" font-family="sans-serif" font-size="19" fill="#1d4ed8">Double-wall Glass</text>
+</svg>
