@@ -417,11 +417,29 @@ function PanelUI({ id }: { id: string }) {
   // Toggle: no drop-shadow (let the panel shadow carry both).
   // Border-radius only on the outward-facing side (away from panel).
   // The connecting side is flat so toggle + panel share a seamless edge.
+  // Toggle rounded corners: ONLY on the viewport-edge side (far from panel).
+  // The connecting side (facing the panel) must be flat to eliminate the gap.
+  //
+  //  right  → toggle sits between panel-right and viewport-right-edge
+  //           connecting side = toggle LEFT  → flat
+  //           viewport side   = toggle RIGHT → rounded-r-2xl
+  //
+  //  left   → toggle sits between viewport-left-edge and panel-left
+  //           connecting side = toggle RIGHT → flat
+  //           viewport side   = toggle LEFT  → rounded-l-2xl
+  //
+  //  bottom → (flex-col-reverse) toggle is below panel
+  //           connecting side = toggle TOP   → flat
+  //           viewport side   = toggle BOTTOM→ rounded-b-2xl
+  //
+  //  top    → (flex-col) toggle is above panel
+  //           connecting side = toggle BOTTOM→ flat
+  //           viewport side   = toggle TOP   → rounded-t-2xl
   const floatToggleCls: Record<ApiPanelPosition, string> = {
-    right:  "flex flex-col items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white px-2 py-5 rounded-l-2xl cursor-pointer shrink-0 transition-colors",
-    left:   "flex flex-col items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white px-2 py-5 rounded-r-2xl cursor-pointer shrink-0 transition-colors",
-    bottom: "flex items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white py-2 px-8 rounded-t-2xl cursor-pointer shrink-0 transition-colors",
-    top:    "flex items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white py-2 px-8 rounded-b-2xl cursor-pointer shrink-0 transition-colors",
+    right:  "flex flex-col items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white px-2 py-5 rounded-r-2xl cursor-pointer shrink-0 transition-colors",
+    left:   "flex flex-col items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white px-2 py-5 rounded-l-2xl cursor-pointer shrink-0 transition-colors",
+    bottom: "flex items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white py-2 px-8 rounded-b-2xl cursor-pointer shrink-0 transition-colors",
+    top:    "flex items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white py-2 px-8 rounded-t-2xl cursor-pointer shrink-0 transition-colors",
   };
 
   // Panel: border only on the 3 sides NOT adjacent to the toggle tab,
