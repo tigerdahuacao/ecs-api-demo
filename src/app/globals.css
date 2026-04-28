@@ -35,9 +35,10 @@
   --os-handle-min-size: 24px;
 }
 
-/* Thin horizontal scrollbar for tab overflows */
+/* Horizontal scrollbar — slightly thicker so it's easy to spot */
 .os-theme-dark.os-scrollbar-horizontal {
-  --os-size: 3px;
+  --os-size: 5px;
+  --os-handle-min-size: 32px;
 }
 
 @layer base {
