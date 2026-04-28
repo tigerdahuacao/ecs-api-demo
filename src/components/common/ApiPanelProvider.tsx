@@ -388,8 +388,9 @@ function PanelUI({ id }: { id: string }) {
         {toolbar}
         {tabBar}
         <OverlayScrollbarsComponent
-          className="flex-1"
+          className="flex-1 min-w-0 min-h-0"
           options={{
+            overflow: { x: "scroll", y: "scroll" },
             scrollbars: {
               theme: "os-theme-dark",
               autoHide: "scroll",
@@ -405,7 +406,7 @@ function PanelUI({ id }: { id: string }) {
   }
 
   // ── FLOAT MODE ────────────────────────────────────────────────────────────
-  // External toggle tab + overlaying panel body (never pushes content)
+
   const floatWrapCls: Record<ApiPanelPosition, string> = {
     right:  "fixed right-0 top-1/2 -translate-y-1/2 z-50 flex flex-row-reverse",
     left:   "fixed left-0 top-1/2 -translate-y-1/2 z-50 flex flex-row",
@@ -413,20 +414,40 @@ function PanelUI({ id }: { id: string }) {
     top:    "fixed top-0 left-1/2 -translate-x-1/2 z-50 flex flex-col",
   };
 
+  // Toggle: no drop-shadow (let the panel shadow carry both).
+  // Border-radius only on the outward-facing side (away from panel).
+  // The connecting side is flat so toggle + panel share a seamless edge.
   const floatToggleCls: Record<ApiPanelPosition, string> = {
-    right:  "flex flex-col items-center justify-center gap-1 bg-primary-600 hover:bg-primary-700 text-white px-1.5 py-4 rounded-l-lg shadow-xl cursor-pointer shrink-0",
-    left:   "flex flex-col items-center justify-center gap-1 bg-primary-600 hover:bg-primary-700 text-white px-1.5 py-4 rounded-r-lg shadow-xl cursor-pointer shrink-0",
-    bottom: "flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white py-1.5 px-6 rounded-t-lg shadow-xl cursor-pointer shrink-0",
-    top:    "flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white py-1.5 px-6 rounded-b-lg shadow-xl cursor-pointer shrink-0",
+    right:  "flex flex-col items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white px-2 py-5 rounded-l-2xl cursor-pointer shrink-0 transition-colors",
+    left:   "flex flex-col items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white px-2 py-5 rounded-r-2xl cursor-pointer shrink-0 transition-colors",
+    bottom: "flex items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white py-2 px-8 rounded-t-2xl cursor-pointer shrink-0 transition-colors",
+    top:    "flex items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white py-2 px-8 rounded-b-2xl cursor-pointer shrink-0 transition-colors",
   };
 
-  const floatPanelStyle: React.CSSProperties = isVertical
+  // Panel: border only on the 3 sides NOT adjacent to the toggle tab,
+  // matching corner radius so toggle + panel form one visual unit.
+  // Soft directional shadow (glass-float aesthetic).
+  const floatPanelCls: Record<ApiPanelPosition, string> = {
+    right:  "border-l border-t border-b border-gray-600/50 rounded-l-2xl",
+    left:   "border-r border-t border-b border-gray-600/50 rounded-r-2xl",
+    bottom: "border-t border-l border-r border-gray-600/50 rounded-t-2xl",
+    top:    "border-b border-l border-r border-gray-600/50 rounded-b-2xl",
+  };
+
+  const floatPanelShadow: Record<ApiPanelPosition, string> = {
+    right:  "-6px 0 36px rgba(0,0,0,0.55), 0 0 0 1px rgba(20,184,166,0.07)",
+    left:   "6px 0 36px rgba(0,0,0,0.55), 0 0 0 1px rgba(20,184,166,0.07)",
+    bottom: "0 -6px 36px rgba(0,0,0,0.55), 0 0 0 1px rgba(20,184,166,0.07)",
+    top:    "0 6px 36px rgba(0,0,0,0.55), 0 0 0 1px rgba(20,184,166,0.07)",
+  };
+
+  const floatPanelSizeStyle: React.CSSProperties = isVertical
     ? { width: 360, height: "min(80vh, 600px)" }
     : { height: 280, width: "min(720px, 95vw)" };
 
   return (
     <div className={floatWrapCls[position]}>
-      {/* Toggle tab */}
+      {/* Toggle tab — no shadow, flat on the side connecting to panel */}
       <div
         className={floatToggleCls[position]}
         onClick={() => setOpen(id, !isOpen)}
@@ -436,7 +457,7 @@ function PanelUI({ id }: { id: string }) {
         onKeyDown={(e) => e.key === "Enter" && setOpen(id, !isOpen)}
       >
         <span
-          className={`text-[10px] font-bold tracking-wider select-none ${
+          className={`text-[10px] font-bold tracking-widest select-none ${
             isVertical ? "[writing-mode:vertical-rl] rotate-180" : ""
           }`}
         >
@@ -444,27 +465,29 @@ function PanelUI({ id }: { id: string }) {
         </span>
       </div>
 
-      {/* Panel body */}
+      {/* Panel body — seamless with toggle: no border on connecting side,
+          matching radius, directional soft shadow */}
       {isOpen && (
         <div
-          className="bg-gray-900 border border-gray-700 flex flex-col shadow-2xl overflow-hidden"
-          style={floatPanelStyle}
+          className={`bg-gray-900/97 flex flex-col overflow-hidden ${floatPanelCls[position]}`}
+          style={{ ...floatPanelSizeStyle, boxShadow: floatPanelShadow[position] }}
         >
           {toolbar}
           {tabBar}
           <OverlayScrollbarsComponent
-          className="flex-1"
-          options={{
-            scrollbars: {
-              theme: "os-theme-dark",
-              autoHide: "scroll",
-              autoHideDelay: 800,
-            },
-          }}
-          defer
-        >
-          <div className="p-3">{renderContent()}</div>
-        </OverlayScrollbarsComponent>
+            className="flex-1 min-w-0 min-h-0"
+            options={{
+              overflow: { x: "scroll", y: "scroll" },
+              scrollbars: {
+                theme: "os-theme-dark",
+                autoHide: "scroll",
+                autoHideDelay: 800,
+              },
+            }}
+            defer
+          >
+            <div className="p-3">{renderContent()}</div>
+          </OverlayScrollbarsComponent>
         </div>
       )}
     </div>
