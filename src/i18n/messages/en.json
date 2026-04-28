@@ -1,0 +1,81 @@
+{
+  "nav": {
+    "product": "Product",
+    "cart": "Cart",
+    "checkout": "Checkout"
+  },
+  "product": {
+    "title": "Celadon Mug",
+    "description": "Premium ceramic with a warm celadon glaze, perfect for daily tea and coffee.",
+    "color": "Color",
+    "size": "Size",
+    "quantity": "Quantity",
+    "addToCart": "Add to Cart",
+    "adding": "Adding...",
+    "addedSuccess": "Added to Cart",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "price": "Price",
+    "specs": "Specifications",
+    "material": "Material",
+    "capacity": "Capacity",
+    "colors": {
+      "teal": "Teal",
+      "white": "White",
+      "navy": "Navy",
+      "terracotta": "Terracotta"
+    },
+    "sizes": {
+      "small": "Small 280ml",
+      "medium": "Medium 380ml",
+      "large": "Large 480ml"
+    }
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "emptyDesc": "Start shopping for some great items",
+    "continueShopping": "Continue Shopping",
+    "remove": "Remove",
+    "quantity": "Qty",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "checkout": "Proceed to Checkout",
+    "recommendations": "You May Also Like",
+    "addToCart": "Add to Cart",
+    "items": "items"
+  },
+  "checkout": {
+    "title": "Order Confirmation",
+    "orderSummary": "Order Summary",
+    "impulse": "Add One More",
+    "addToOrder": "Add to Order",
+    "placeOrder": "Place Order",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "freeShipping": "Free",
+    "total": "Total",
+    "orderPlaced": "Order Placed",
+    "orderPlacedDesc": "Thank you for your purchase!"
+  },
+  "apiPanel": {
+    "title": "API Debug Panel",
+    "request": "Request",
+    "response": "Response",
+    "suggestions": "Suggestions",
+    "nextSteps": "Next Steps",
+    "noData": "No data yet",
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "yuan": "¥"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "nav": {
+    "product": "商品详情",
+    "cart": "购物车",
+    "checkout": "结算"
+  },
+  "product": {
+    "title": "青釉马克杯",
+    "description": "精选优质陶瓷，青绿釉色温润如玉，适合日常茶饮与咖啡享用。",
+    "color": "颜色",
+    "size": "规格",
+    "quantity": "数量",
+    "addToCart": "加入购物车",
+    "adding": "添加中...",
+    "addedSuccess": "已加入购物车",
+    "inStock": "有货",
+    "outOfStock": "缺货",
+    "price": "价格",
+    "specs": "规格参数",
+    "material": "材质",
+    "capacity": "容量",
+    "colors": {
+      "teal": "青绿",
+      "white": "纯白",
+      "navy": "深蓝",
+      "terracotta": "砖红"
+    },
+    "sizes": {
+      "small": "小杯 280ml",
+      "medium": "中杯 380ml",
+      "large": "大杯 480ml"
+    }
+  },
+  "cart": {
+    "title": "购物车",
+    "empty": "购物车为空",
+    "emptyDesc": "去选购一些好物吧",
+    "continueShopping": "继续购物",
+    "remove": "删除",
+    "quantity": "数量",
+    "subtotal": "小计",
+    "total": "合计",
+    "checkout": "去结算",
+    "recommendations": "为你推荐",
+    "addToCart": "加入购物车",
+    "items": "件商品"
+  },
+  "checkout": {
+    "title": "确认订单",
+    "orderSummary": "订单明细",
+    "impulse": "顺手买一件",
+    "addToOrder": "加入订单",
+    "placeOrder": "提交订单",
+    "subtotal": "商品小计",
+    "shipping": "运费",
+    "freeShipping": "免费",
+    "total": "应付总额",
+    "orderPlaced": "订单已提交",
+    "orderPlacedDesc": "感谢您的购买！"
+  },
+  "apiPanel": {
+    "title": "API 调试面板",
+    "request": "请求",
+    "response": "响应",
+    "suggestions": "优化建议",
+    "nextSteps": "后续处理",
+    "noData": "暂无数据",
+    "collapse": "收起",
+    "expand": "展开"
+  },
+  "theme": {
+    "light": "浅色",
+    "dark": "深色"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "发生错误",
+    "retry": "重试",
+    "yuan": "元"
+  }
+}
