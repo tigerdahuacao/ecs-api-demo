@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <rect width="800" height="800" fill="#fefce8"/>
+  <rect x="210" y="170" width="290" height="370" rx="25" fill="#d97706" stroke="#b45309" stroke-width="5"/>
+  <rect x="210" y="240" width="290" height="12" rx="6" fill="#92400e" opacity="0.4"/>
+  <rect x="210" y="300" width="290" height="12" rx="6" fill="#92400e" opacity="0.4"/>
+  <rect x="210" y="360" width="290" height="12" rx="6" fill="#92400e" opacity="0.4"/>
+  <rect x="210" y="420" width="290" height="12" rx="6" fill="#92400e" opacity="0.4"/>
+  <path d="M500 270 Q568 270 568 350 Q568 430 500 430" fill="none" stroke="#b45309" stroke-width="20" stroke-linecap="round"/>
+  <rect x="210" y="510" width="290" height="26" rx="13" fill="#b45309"/>
+  <text x="355" y="620" text-anchor="middle" font-family="sans-serif" font-size="28" fill="#78350f" font-weight="bold">竹节纹陶杯</text>
+  <text x="355" y="656" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#92400e">Bamboo Cup</text>
+</svg>

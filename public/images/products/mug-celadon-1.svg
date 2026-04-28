@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <rect width="800" height="800" fill="#e0f2f1"/>
+  <rect x="200" y="180" width="300" height="380" rx="30" fill="#80cbc4" stroke="#4db6ac" stroke-width="6"/>
+  <path d="M500 280 Q580 280 580 360 Q580 440 500 440" fill="none" stroke="#4db6ac" stroke-width="22" stroke-linecap="round"/>
+  <rect x="200" y="530" width="300" height="30" rx="15" fill="#4db6ac"/>
+  <text x="400" y="620" text-anchor="middle" font-family="sans-serif" font-size="32" fill="#00695c" font-weight="bold">青釉马克杯</text>
+  <text x="400" y="660" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#00796b">Celadon Mug</text>
+  <ellipse cx="350" cy="210" rx="60" ry="18" fill="#b2dfdb" opacity="0.6"/>
+</svg>
