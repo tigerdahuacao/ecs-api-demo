@@ -53,22 +53,49 @@ export function ApiPanelProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  /**
+   * BOTTOM sidebar is fundamentally different from the other three directions.
+   *
+   * LEFT / RIGHT / TOP:  padding shrinks the content area inward — the effect is
+   *   immediately visible because width or the start-position change.
+   *
+   * BOTTOM with padding: only adds whitespace *below* existing content.
+   *   On a short page the content never moves — visually indistinguishable from
+   *   the panel just floating on top.
+   *
+   * BOTTOM fix: cap the wrapper at  `height = 100vh − panelSize`  and let it
+   *   scroll internally. This mirrors how the browser shrinks the page when
+   *   DevTools opens at the bottom — the visible area literally gets smaller.
+   *   Sticky Navbar still works because it sticks within the scrolling wrapper.
+   */
+  const isBottomSidebar = offsets.bottom > 0;
+
+  const wrapperStyle: React.CSSProperties = isBottomSidebar
+    ? {
+        // Viewport-bounded container that ends where the panel starts
+        height: `calc(100vh - ${offsets.bottom}px)`,
+        overflowY: "auto",
+        overflowX: "hidden",
+        paddingRight: offsets.right,
+        paddingLeft: offsets.left,
+        paddingTop: offsets.top,
+        transition: "height 200ms ease, padding 200ms ease",
+        boxSizing: "border-box",
+      }
+    : {
+        // Padding-based approach for left / right / top
+        paddingRight: offsets.right,
+        paddingLeft: offsets.left,
+        paddingTop: offsets.top,
+        paddingBottom: offsets.bottom,
+        minHeight: "100vh",
+        transition: "padding 200ms ease",
+        boxSizing: "border-box",
+      };
+
   return (
     <>
-      {/* Content wrapper — padding keeps content clear of sidebar panels */}
-      <div
-        style={{
-          paddingRight: offsets.right,
-          paddingLeft: offsets.left,
-          paddingTop: offsets.top,
-          paddingBottom: offsets.bottom,
-          transition: "padding 200ms ease",
-          minHeight: "100vh",
-          boxSizing: "border-box",
-        }}
-      >
-        {children}
-      </div>
+      <div style={wrapperStyle}>{children}</div>
 
       {/* Render each registered panel's UI */}
       {Object.values(configs).map((config) => (
