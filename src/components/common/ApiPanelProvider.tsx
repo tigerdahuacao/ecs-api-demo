@@ -8,6 +8,8 @@ import {
   Columns2, Rows2, Magnet,
   ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
 } from "lucide-react";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import "overlayscrollbars/overlayscrollbars.css";
 import { useApiPanelStore, type ApiPanelMode } from "@/store/api-panel";
 import type { ApiPanelPosition } from "@/types";
 
@@ -348,7 +350,19 @@ function PanelUI({ id }: { id: string }) {
 
         {toolbar}
         {tabBar}
-        <div className="flex-1 overflow-auto p-3">{renderContent()}</div>
+        <OverlayScrollbarsComponent
+          className="flex-1"
+          options={{
+            scrollbars: {
+              theme: "os-theme-dark",
+              autoHide: "scroll",
+              autoHideDelay: 800,
+            },
+          }}
+          defer
+        >
+          <div className="p-3">{renderContent()}</div>
+        </OverlayScrollbarsComponent>
       </div>
     );
   }
@@ -401,7 +415,19 @@ function PanelUI({ id }: { id: string }) {
         >
           {toolbar}
           {tabBar}
-          <div className="flex-1 overflow-auto p-3">{renderContent()}</div>
+          <OverlayScrollbarsComponent
+          className="flex-1"
+          options={{
+            scrollbars: {
+              theme: "os-theme-dark",
+              autoHide: "scroll",
+              autoHideDelay: 800,
+            },
+          }}
+          defer
+        >
+          <div className="p-3">{renderContent()}</div>
+        </OverlayScrollbarsComponent>
         </div>
       )}
     </div>
