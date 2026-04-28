@@ -19,6 +19,27 @@
 }
 
 
+/* ── ApiPanel OverlayScrollbars custom theme ──────────────────────────────── */
+/* Override os-theme-dark to match the panel's teal aesthetic */
+.os-theme-dark.os-scrollbar {
+  --os-size: 4px;
+  --os-padding-perpendicular: 0px;
+  --os-track-border-radius: 9999px;
+  --os-track-bg: transparent;
+  --os-track-bg-hover: transparent;
+  --os-track-bg-active: transparent;
+  --os-handle-border-radius: 9999px;
+  --os-handle-bg: rgba(75, 85, 99, 0.7);   /* gray-600 semi */
+  --os-handle-bg-hover: oklch(0.532 0.134 185); /* primary-600 */
+  --os-handle-bg-active: oklch(0.449 0.111 186); /* primary-700 */
+  --os-handle-min-size: 24px;
+}
+
+/* Thin horizontal scrollbar for tab overflows */
+.os-theme-dark.os-scrollbar-horizontal {
+  --os-size: 3px;
+}
+
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
