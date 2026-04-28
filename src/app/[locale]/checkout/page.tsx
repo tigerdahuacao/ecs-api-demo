@@ -1,10 +1,43 @@
+/**
+ * @file src/app/[locale]/checkout/page.tsx
+ * 结算页路由 / Checkout page route
+ *
+ * 路由 / Route: /zh/checkout 或 /en/checkout
+ *
+ * 作用 / Purpose:
+ *   组合结算视图（CheckoutView）和 ApiPanel 调试面板。
+ *   注册的面板 id="checkout-order" 用于展示：
+ *     - GET /api/cart（加载订单摘要）
+ *     - GET /api/recommendations（加载冲动消费推荐）
+ *     - （演示）模拟的 POST /api/orders
+ *
+ *   Composes the checkout view (CheckoutView) with the ApiPanel debug panel.
+ *   The registered panel id="checkout-order" displays:
+ *     - GET /api/cart (load order summary)
+ *     - GET /api/recommendations (load impulse-buy recommendations)
+ *     - (demo) simulated POST /api/orders
+ *
+ * 子组件 / Child components:
+ *   - CheckoutView（订单摘要、运费信息、冲动消费推荐、下单按钮的主体 UI）
+ *   - ApiPanel（调试面板注册，defaultPosition="right" 停靠在右侧）
+ */
 import { CheckoutView } from "@/components/checkout/CheckoutView";
 import { ApiPanel } from "@/components/common/ApiPanel";
 
+/**
+ * CheckoutPage — 结算页
+ * CheckoutPage — checkout page
+ */
 export default function CheckoutPage() {
   return (
     <div className="relative">
+      {/* 结算主体 / Main checkout UI */}
       <CheckoutView />
+
+      {/*
+       * ApiPanel — 右侧调试面板
+       * ApiPanel — right-side debug panel
+       */}
       <ApiPanel
         id="checkout-order"
         title="POST /api/orders (demo)"

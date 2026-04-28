@@ -1,8 +1,34 @@
+/**
+ * @file src/app/api/cart/route.ts
+ * GET /api/cart  — 获取购物车列表 / Get cart items
+ * POST /api/cart — 加入购物车   / Add item to cart
+ *
+ * 调用方 / Called by:
+ *   GET:
+ *     CartView.fetchCart()     → 购物车页加载时 / On cart page load
+ *     CheckoutView.fetchData() → 结算页加载时 / On checkout page load
+ *   POST:
+ *     ProductDetail.handleAddToCart()  → 商品页"加入购物车"
+ *     RecommendationCard.handleAdd()   → 购物车页推荐商品加购
+ *     ImpulseItem.handleAdd()          → 结算页冲动消费加购
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { MOCK_PRODUCTS, mockCart, isMock } from "@/lib/mock-data";
 import type { ApiResponse, CartItem } from "@/types";
 
-// GET /api/cart?sessionId=xxx
+/**
+ * GET /api/cart?sessionId=xxx — 返回指定会话的购物车条目（含关联商品信息）
+ * GET /api/cart?sessionId=xxx — return cart items for a session (with product info)
+ *
+ * 查询参数 / Query params:
+ *   sessionId (必填) — 匿名用户会话 ID / Anonymous user session ID (required)
+ *
+ * 响应格式 / Response format:
+ *   成功 / Success: { success: true, data: CartItem[] }（每条含 product 关联）
+ *   缺参 / Missing param: { success: false, error: "sessionId required" } (status 400)
+ *
+ * @param req 含 sessionId 查询参数的请求 / Request with sessionId query param
+ */
 export async function GET(req: NextRequest) {
   const sessionId = req.nextUrl.searchParams.get("sessionId");
 
@@ -46,7 +72,20 @@ export async function GET(req: NextRequest) {
   });
 }
 
-// POST /api/cart
+/**
+ * POST /api/cart — 加购商品（相同 sessionId+productId+specs 则合并数量）
+ * POST /api/cart — add item to cart (merges quantity if same sessionId+productId+specs)
+ *
+ * 请求体 / Request body:
+ *   { sessionId: string, productId: string, quantity: number, specs: Record<string,string> }
+ *
+ * 响应格式 / Response format:
+ *   成功 / Success: { success: true, data: CartItem } (status 201)（含 product 关联）
+ *   缺参 / Missing fields: { success: false, error: "Missing required fields" } (status 400)
+ *   商品不存在 / Product not found: { success: false, error: "Product not found" } (status 404)
+ *
+ * @param req 含购物车条目数据的请求体 / Request with cart item data in body
+ */
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as {
     sessionId: string;
