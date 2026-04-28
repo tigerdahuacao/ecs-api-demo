@@ -463,11 +463,19 @@ function PanelUI({ id }: { id: string }) {
     ? { width: 360, height: "min(80vh, 600px)" }
     : { height: 280, width: "min(720px, 95vw)" };
 
+  // Closed: full capsule (both sides rounded).
+  // Open:   flat on the connecting side only (seamless join with panel).
+  const floatToggleClosedCls = isVertical
+    ? "flex flex-col items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white px-2 py-5 rounded-full cursor-pointer shrink-0 transition-all shadow-lg"
+    : "flex items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white py-2 px-8 rounded-full cursor-pointer shrink-0 transition-all shadow-lg";
+
   return (
     <div className={floatWrapCls[position]}>
-      {/* Toggle tab — no shadow, flat on the side connecting to panel */}
+      {/* Toggle tab:
+          - closed → full capsule (standalone pill, looks complete)
+          - open   → flat on the connecting side (seamless join with panel) */}
       <div
-        className={floatToggleCls[position]}
+        className={isOpen ? floatToggleCls[position] : floatToggleClosedCls}
         onClick={() => setOpen(id, !isOpen)}
         role="button"
         tabIndex={0}
