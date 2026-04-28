@@ -43,6 +43,6 @@ next-env.d.ts
 # Claude Code local files
 .claude/
 
-# Temp files
-C*/
+# Temp files (Windows drive-letter paths like "C：tmp...")
+[C]?\xef\x80\xba*
 
