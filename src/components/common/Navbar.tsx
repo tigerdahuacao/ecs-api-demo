@@ -6,14 +6,22 @@ import { ShoppingCart, Package } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useCartStore } from "@/store/cart";
+import { useApiPanelNavbarTop } from "@/store/api-panel";
 
 export function Navbar() {
   const t = useTranslations("nav");
   const locale = useLocale();
   const totalCount = useCartStore((s) => s.totalCount());
 
+  // When a "top" sidebar panel is active, the Navbar must stick below it.
+  // Otherwise sticky top-0 would scroll the Navbar behind the fixed panel.
+  const stickyTop = useApiPanelNavbarTop();
+
   return (
-    <header className="sticky top-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-800">
+    <header
+      className="sticky z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-800 transition-[top] duration-200"
+      style={{ top: stickyTop }}
+    >
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link

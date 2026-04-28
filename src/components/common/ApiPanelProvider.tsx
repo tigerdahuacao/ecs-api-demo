@@ -10,12 +10,8 @@ import {
 } from "lucide-react";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import "overlayscrollbars/overlayscrollbars.css";
-import { useApiPanelStore, type ApiPanelMode } from "@/store/api-panel";
+import { useApiPanelStore, type ApiPanelMode, CLOSED_TAB_PX } from "@/store/api-panel";
 import type { ApiPanelPosition } from "@/types";
-
-// Width of the "closed tab" shown in sidebar mode when no panel is open.
-// This is small enough to never cause significant overlap.
-const CLOSED_TAB_PX = 24;
 
 // ─── Layout wrapper ───────────────────────────────────────────────────────────
 
@@ -180,7 +176,7 @@ function PanelUI({ id }: { id: string }) {
     const raw = activeTab === "request" ? entry?.request : entry?.response;
     if (!raw) return <p className="text-xs text-gray-500 italic">{t("noData")}</p>;
     return (
-      <pre className="text-xs font-mono leading-relaxed text-green-400 overflow-auto">
+      <pre className="text-xs font-mono leading-relaxed text-green-400 whitespace-pre">
         {JSON.stringify(raw, null, 2)}
       </pre>
     );
@@ -260,29 +256,43 @@ function PanelUI({ id }: { id: string }) {
 
   // ── Tab bar ────────────────────────────────────────────────────────────────
   const tabBar = (
-    <div className="flex border-b border-gray-700 shrink-0 overflow-x-auto">
-      {tabs.map(({ key, label }) => {
-        const Icon = TAB_ICONS[key];
-        return (
-          <button
-            key={key}
-            onClick={() => setActiveTab(key)}
-            className={`flex items-center gap-1 px-3 py-1.5 text-[11px] whitespace-nowrap transition-colors ${
-              activeTab === key
-                ? "text-primary-400 border-b-2 border-primary-400 -mb-px bg-gray-900"
-                : "text-gray-500 hover:text-gray-300"
-            }`}
-          >
-            <Icon size={11} />
-            {label}
-          </button>
-        );
-      })}
-      {entry?.timestamp && (
-        <span className="ml-auto px-3 py-1.5 text-[10px] text-gray-600 self-center">
-          {new Date(entry.timestamp).toLocaleTimeString()}
-        </span>
-      )}
+    <div className="border-b border-gray-700 shrink-0">
+      <OverlayScrollbarsComponent
+        options={{
+          scrollbars: {
+            theme: "os-theme-dark",
+            autoHide: "scroll",
+            autoHideDelay: 600,
+          },
+          overflow: { x: "scroll", y: "hidden" },
+        }}
+        defer
+      >
+        <div className="flex">
+          {tabs.map(({ key, label }) => {
+            const Icon = TAB_ICONS[key];
+            return (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className={`flex items-center gap-1 px-3 py-1.5 text-[11px] whitespace-nowrap transition-colors ${
+                  activeTab === key
+                    ? "text-primary-400 border-b-2 border-primary-400 -mb-px bg-gray-900"
+                    : "text-gray-500 hover:text-gray-300"
+                }`}
+              >
+                <Icon size={11} />
+                {label}
+              </button>
+            );
+          })}
+          {entry?.timestamp && (
+            <span className="ml-auto px-3 py-1.5 text-[10px] text-gray-600 self-center">
+              {new Date(entry.timestamp).toLocaleTimeString()}
+            </span>
+          )}
+        </div>
+      </OverlayScrollbarsComponent>
     </div>
   );
 
