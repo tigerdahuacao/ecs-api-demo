@@ -393,13 +393,13 @@ function PanelUI({ id }: { id: string }) {
             overflow: { x: "scroll", y: "scroll" },
             scrollbars: {
               theme: "os-theme-dark",
-              autoHide: "scroll",
-              autoHideDelay: 800,
+              autoHide: "move",
+              autoHideDelay: 1200,
             },
           }}
           defer
         >
-          <div className="p-3">{renderContent()}</div>
+          <div className="p-3" style={{ minWidth: "max-content", minHeight: "100%" }}>{renderContent()}</div>
         </OverlayScrollbarsComponent>
       </div>
     );
@@ -506,13 +506,13 @@ function PanelUI({ id }: { id: string }) {
               overflow: { x: "scroll", y: "scroll" },
               scrollbars: {
                 theme: "os-theme-dark",
-                autoHide: "scroll",
-                autoHideDelay: 800,
+                autoHide: "move",
+                autoHideDelay: 1200,
               },
             }}
             defer
           >
-            <div className="p-3">{renderContent()}</div>
+            <div className="p-3" style={{ minWidth: "max-content", minHeight: "100%" }}>{renderContent()}</div>
           </OverlayScrollbarsComponent>
         </div>
       )}
