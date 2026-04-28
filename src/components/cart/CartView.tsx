@@ -28,7 +28,7 @@ export function CartView() {
         `/api/cart?sessionId=${sessionId}`,
         { panelId: "cart-ops" }
       );
-      if (res.success && res.data) {
+      if (res.success && res.data && res.data.length > 0) {
         setItems(res.data);
 
         // Fetch recommendations based on first cart item
