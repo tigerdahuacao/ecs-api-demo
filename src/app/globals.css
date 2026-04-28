@@ -1,26 +1,31 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Dark mode via class strategy */
+@variant dark (&:where(.dark, .dark *));
+
+/* Primary color palette (teal/cyan) */
+@theme {
+  --color-primary-50: oklch(0.984 0.014 180);
+  --color-primary-100: oklch(0.953 0.051 180);
+  --color-primary-200: oklch(0.893 0.099 180);
+  --color-primary-300: oklch(0.81 0.149 180);
+  --color-primary-400: oklch(0.715 0.165 183);
+  --color-primary-500: oklch(0.621 0.147 185);
+  --color-primary-600: oklch(0.532 0.134 185);
+  --color-primary-700: oklch(0.449 0.111 186);
+  --color-primary-800: oklch(0.374 0.09 186);
+  --color-primary-900: oklch(0.302 0.066 186);
+  --color-primary-950: oklch(0.2 0.044 186);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
 }

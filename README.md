@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ECS Playground — E-Commerce Payment Demo
 
-## Getting Started
+全栈电商支付测试 Demo，技术栈：Next.js 15 + Tailwind v4 + Prisma + MongoDB + Zustand + next-intl。
 
-First, run the development server:
+## 快速启动
+
+### 1. 配置环境变量
+
+复制 `.env.example` 为 `.env.local`，填写 MongoDB 连接字符串：
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
+# 编辑 .env.local，填写 DATABASE_URL
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+MongoDB Atlas 免费账号：https://www.mongodb.com/atlas
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. 安装依赖并生成 Prisma 客户端
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm install
+# postinstall 会自动执行 prisma generate
+```
 
-## Learn More
+### 3. 推送数据库结构 + 种子数据
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm db:push    # 推送 schema 到 MongoDB
+pnpm db:seed    # 写入示例商品数据
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. 启动开发服务器
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm dev
+```
 
-## Deploy on Vercel
+打开 http://localhost:3000 → 自动跳转至 `/zh/product`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 页面路由
+
+| 路由 | 说明 |
+|------|------|
+| `/zh/product` | 商品详情页（青釉马克杯） |
+| `/zh/cart` | 购物车页面 |
+| `/zh/checkout` | 结算页面 |
+| `/en/product` | 英文版商品详情 |
+
+## API 路由
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/products` | 获取商品列表 |
+| GET | `/api/products/:id` | 获取单个商品 |
+| GET | `/api/cart?sessionId=` | 获取购物车 |
+| POST | `/api/cart` | 加入购物车 |
+| PATCH | `/api/cart/:id` | 更新数量 |
+| DELETE | `/api/cart/:id` | 删除商品 |
+| GET | `/api/recommendations?productId=` | 获取推荐 |
+
+## 功能特性
+
+- 🌓 深色/浅色模式切换（Tailwind v4 class strategy）
+- 🌐 i18n 中/英双语（next-intl，可扩展日语/西班牙语）
+- 🔍 ApiPanel 调试面板 — 实时展示每个 API 的 request/response
+- 📱 移动端响应式适配
+- 💾 sessionStorage 持久化购物车
+
+## Cloudflare Pages 部署
+
+```bash
+pnpm pages:build   # 构建 Cloudflare Pages 产物
+```
+
+在 Cloudflare Dashboard 配置 `DATABASE_URL` 环境变量后直接部署 `out/` 目录。
