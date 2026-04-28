@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import type { ApiPanelPosition } from "@/types";
 
+/** Width of the closed-state tab in sidebar mode (px). Shared with Navbar. */
+export const CLOSED_TAB_PX = 24;
+
 export type ApiPanelMode = "float" | "sidebar";
 
 export interface PanelDataEntry {
@@ -162,3 +165,24 @@ export const useApiPanelStore = create<ApiPanelStoreState>((set, get) => ({
     }));
   },
 }));
+
+/**
+ * Returns the px offset the Navbar should use for its sticky `top` value.
+ * When a "top" sidebar panel is open, the Navbar must stick BELOW the panel,
+ * not at viewport top-0 (which would hide it behind the fixed panel).
+ */
+export function useApiPanelNavbarTop(): number {
+  const global = useApiPanelStore((s) => s.global);
+  const configs = useApiPanelStore((s) => s.configs);
+  const instances = useApiPanelStore((s) => s.instances);
+
+  if (global.mode !== "sidebar" || global.position !== "top") return 0;
+  if (!Object.keys(configs).length) return 0;
+
+  const openSizes = Object.keys(configs)
+    .map((id) => instances[id])
+    .filter((inst) => inst?.isOpen)
+    .map((inst) => inst!.size);
+
+  return openSizes.length > 0 ? Math.max(...openSizes) : CLOSED_TAB_PX;
+}
