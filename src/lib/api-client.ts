@@ -24,15 +24,16 @@ export async function apiFetch<T>(
   const data = (await res.json()) as T;
 
   if (panelId) {
-    useApiPanelStore.getState().setEntry(panelId, {
+    const store = useApiPanelStore.getState();
+    store.setEntry(panelId, {
       request,
       response: { status: res.status, ok: res.ok, data },
       timestamp: Date.now(),
     });
-    // Auto-open panel when new data arrives
-    const settings = useApiPanelStore.getState().getSettings(panelId);
-    if (!settings.isOpen) {
-      useApiPanelStore.getState().setOpen(panelId, true);
+    // Auto-open the panel when new data arrives
+    const instance = store.instances[panelId];
+    if (!instance?.isOpen) {
+      store.setOpen(panelId, true);
     }
   }
 

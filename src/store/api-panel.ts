@@ -9,10 +9,16 @@ export interface PanelDataEntry {
   timestamp: number;
 }
 
-export interface PanelSettings {
+// ── Global settings — shared across ALL panels and ALL routes ──────────────
+// Position and mode are global: changing on one panel updates all panels.
+export interface GlobalPanelSettings {
   position: ApiPanelPosition;
   mode: ApiPanelMode;
-  size: number; // width (left/right) or height (top/bottom) in px
+}
+
+// ── Per-panel instance state — only size & isOpen ─────────────────────────
+export interface PanelInstanceState {
+  size: number;   // width (left/right) or height (top/bottom) in px
   isOpen: boolean;
 }
 
@@ -25,59 +31,112 @@ export interface PanelConfig {
 }
 
 const DEFAULT_SIZE = 360;
-const STORAGE_KEY = "ecs_api_panel_settings";
+const GLOBAL_KEY = "ecs_api_panel_global";
+const INSTANCE_KEY = "ecs_api_panel_instances";
 
-function loadSettings(): Record<string, PanelSettings> {
+function loadGlobal(): GlobalPanelSettings {
+  if (typeof window === "undefined") return { position: "right", mode: "float" };
+  try {
+    return (
+      (JSON.parse(localStorage.getItem(GLOBAL_KEY) ?? "null") as GlobalPanelSettings | null) ?? {
+        position: "right",
+        mode: "float",
+      }
+    );
+  } catch {
+    return { position: "right", mode: "float" };
+  }
+}
+
+function saveGlobal(s: GlobalPanelSettings) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(GLOBAL_KEY, JSON.stringify(s));
+}
+
+function loadInstances(): Record<string, PanelInstanceState> {
   if (typeof window === "undefined") return {};
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+    return JSON.parse(localStorage.getItem(INSTANCE_KEY) ?? "{}") as Record<
+      string,
+      PanelInstanceState
+    >;
   } catch {
     return {};
   }
 }
 
-function saveSettings(settings: Record<string, PanelSettings>) {
+function saveInstances(s: Record<string, PanelInstanceState>) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  localStorage.setItem(INSTANCE_KEY, JSON.stringify(s));
 }
 
 interface ApiPanelStoreState {
-  entries: Record<string, PanelDataEntry>;
-  settings: Record<string, PanelSettings>;
-  configs: Record<string, PanelConfig>;
+  // Global settings (position + mode) — persisted, affects all panels
+  global: GlobalPanelSettings;
+  setGlobalPosition: (position: ApiPanelPosition) => void;
+  setGlobalMode: (mode: ApiPanelMode) => void;
 
-  // Panel registration (called by page-level ApiPanel)
+  // Per-panel instance state (size + isOpen) — persisted per panel id
+  instances: Record<string, PanelInstanceState>;
+  setOpen: (id: string, isOpen: boolean) => void;
+  setSize: (id: string, size: number) => void;
+
+  // API data entries
+  entries: Record<string, PanelDataEntry>;
+  setEntry: (id: string, entry: PanelDataEntry) => void;
+
+  // Panel configs (registered by page-level <ApiPanel /> components)
+  configs: Record<string, PanelConfig>;
   registerPanel: (config: PanelConfig) => void;
   unregisterPanel: (id: string) => void;
 
-  // Data updates (called by api-client)
-  setEntry: (id: string, entry: PanelDataEntry) => void;
-
-  // UI state (called by ApiPanelProvider)
-  setOpen: (id: string, isOpen: boolean) => void;
-  setPosition: (id: string, position: ApiPanelPosition) => void;
-  setMode: (id: string, mode: ApiPanelMode) => void;
-  setSize: (id: string, size: number) => void;
-
-  // Derived helpers
-  getSettings: (id: string) => PanelSettings;
   initFromStorage: () => void;
 }
 
 export const useApiPanelStore = create<ApiPanelStoreState>((set, get) => ({
+  global: { position: "right", mode: "float" },
+  instances: {},
   entries: {},
-  settings: {},
   configs: {},
+
+  setGlobalPosition: (position) => {
+    const next = { ...get().global, position };
+    saveGlobal(next);
+    set({ global: next });
+  },
+
+  setGlobalMode: (mode) => {
+    const next = { ...get().global, mode };
+    saveGlobal(next);
+    set({ global: next });
+  },
+
+  setOpen: (id, isOpen) => {
+    const instances = get().instances;
+    const cur = instances[id] ?? { size: DEFAULT_SIZE, isOpen: false };
+    const next = { ...instances, [id]: { ...cur, isOpen } };
+    saveInstances(next);
+    set({ instances: next });
+  },
+
+  setSize: (id, size) => {
+    const instances = get().instances;
+    const cur = instances[id] ?? { size: DEFAULT_SIZE, isOpen: false };
+    const next = { ...instances, [id]: { ...cur, size } };
+    saveInstances(next);
+    set({ instances: next });
+  },
+
+  setEntry: (id, entry) =>
+    set((s) => ({ entries: { ...s.entries, [id]: entry } })),
 
   registerPanel: (config) =>
     set((s) => ({
       configs: { ...s.configs, [config.id]: config },
-      // Initialize settings from storage or defaults
-      settings: {
-        ...s.settings,
-        [config.id]: s.settings[config.id] ?? {
-          position: config.defaultPosition,
-          mode: "float",
+      // Initialise instance if not already tracked (localStorage fills in later)
+      instances: {
+        ...s.instances,
+        [config.id]: s.instances[config.id] ?? {
           size: DEFAULT_SIZE,
           isOpen: false,
         },
@@ -90,70 +149,15 @@ export const useApiPanelStore = create<ApiPanelStoreState>((set, get) => ({
       return { configs };
     }),
 
-  setEntry: (id, entry) =>
-    set((s) => ({ entries: { ...s.entries, [id]: entry } })),
-
-  setOpen: (id, isOpen) => {
-    const settings = get().settings;
-    const current = settings[id];
-    if (!current) return;
-    const next = { ...settings, [id]: { ...current, isOpen } };
-    saveSettings(next);
-    set({ settings: next });
-  },
-
-  setPosition: (id, position) => {
-    const settings = get().settings;
-    const current = settings[id];
-    if (!current) return;
-    const next = { ...settings, [id]: { ...current, position } };
-    saveSettings(next);
-    set({ settings: next });
-  },
-
-  setMode: (id, mode) => {
-    const settings = get().settings;
-    const current = settings[id];
-    if (!current) return;
-    const next = { ...settings, [id]: { ...current, mode } };
-    saveSettings(next);
-    set({ settings: next });
-  },
-
-  setSize: (id, size) => {
-    const settings = get().settings;
-    const current = settings[id];
-    if (!current) return;
-    const next = { ...settings, [id]: { ...current, size } };
-    saveSettings(next);
-    set({ settings: next });
-  },
-
-  getSettings: (id) => {
-    const s = get().settings[id];
-    const config = get().configs[id];
-    return (
-      s ?? {
-        position: config?.defaultPosition ?? "right",
-        mode: "float",
-        size: DEFAULT_SIZE,
-        isOpen: false,
-      }
-    );
-  },
-
   initFromStorage: () => {
-    const stored = loadSettings();
+    const global = loadGlobal();
+    const stored = loadInstances();
     set((s) => ({
-      settings: {
+      global,
+      instances: {
+        // Merge: stored data takes priority, then current in-memory defaults
+        ...s.instances,
         ...stored,
-        // Merge with any already-registered panels
-        ...Object.fromEntries(
-          Object.entries(s.settings).map(([id, cur]) => [
-            id,
-            stored[id] ?? cur,
-          ])
-        ),
       },
     }));
   },
