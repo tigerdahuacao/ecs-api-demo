@@ -1,0 +1,49 @@
+// Prisma schema for MongoDB
+// Products, CartItems and Recommendations for e-commerce payment demo
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// Product model - supports i18n via Json fields
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  // I18n: { zh: string, en: string }
+  name        Json
+  description Json
+  price       Float
+  images      String[]
+  category    String
+  // Spec: [{ name: { zh, en }, options: string[] }]
+  specs       Json[]
+  stock       Int      @default(100)
+  createdAt   DateTime @default(now())
+}
+
+// CartItem model - keyed by sessionId for anonymous carts
+model CartItem {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId String
+  productId String   @db.ObjectId
+  quantity  Int      @default(1)
+  // Selected spec values: { color: "teal", size: "medium" }
+  specs     Json
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+}
+
+// Recommendation edges between products
+model Recommendation {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  productId String @db.ObjectId
+  relatedId String @db.ObjectId
+  score     Float  @default(1.0)
+
+  @@index([productId])
+}
