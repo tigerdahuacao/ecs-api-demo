@@ -43,6 +43,7 @@ next-env.d.ts
 # Claude Code local files
 .claude/
 
-# Temp files (Windows drive-letter paths like "C：tmp...")
-[C]?\xef\x80\xba*
+# Temp files — Windows full-width colon paths (e.g. C：tmpmock.log)
+*tmpmock*
+*tmpmock-server*
 
