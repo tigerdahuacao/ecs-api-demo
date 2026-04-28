@@ -106,7 +106,14 @@ export const MOCK_PRODUCTS: Product[] = [
 ];
 
 // In-memory cart for mock mode (per process lifetime)
-export const mockCart: CartItem[] = [];
+// Survive Next.js HMR hot-reloads: module re-evaluation resets module-level
+// variables, but the `global` object persists across reloads in dev mode.
+declare global {
+  // eslint-disable-next-line no-var
+  var __mockCart: CartItem[] | undefined;
+}
+global.__mockCart = global.__mockCart ?? [];
+export const mockCart: CartItem[] = global.__mockCart;
 
 export const MOCK_RECOMMENDATIONS: Recommendation[] = [
   {
