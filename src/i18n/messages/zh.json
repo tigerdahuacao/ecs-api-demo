@@ -58,7 +58,11 @@
     "orderPlaced": "订单已提交",
     "orderPlacedDesc": "感谢您的购买！",
     "codDesc": "商品送达时当面付款。请确保收货地址准确，配送员会提前联系您。",
-    "confirmCod": "确认货到付款"
+    "confirmCod": "确认货到付款",
+    "expressCheckout": "PayPal 快捷结账",
+    "orExpressCheckout": "或者快捷结账",
+    "expressApprovedDesc": "您已通过 PayPal 完成授权，点击下方按钮完成支付",
+    "confirmAndPay": "确认并完成支付"
   },
   "apiPanel": {
     "title": "API 调试面板",

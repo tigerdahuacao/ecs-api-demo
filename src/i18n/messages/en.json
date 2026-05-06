@@ -58,7 +58,11 @@
     "orderPlaced": "Order Placed",
     "orderPlacedDesc": "Thank you for your purchase!",
     "codDesc": "Pay when your order arrives. Make sure your delivery address is correct — our courier will contact you beforehand.",
-    "confirmCod": "Confirm Cash on Delivery"
+    "confirmCod": "Confirm Cash on Delivery",
+    "expressCheckout": "PayPal Express Checkout",
+    "orExpressCheckout": "Or express checkout",
+    "expressApprovedDesc": "You've authorized via PayPal. Click below to complete payment.",
+    "confirmAndPay": "Confirm & Pay"
   },
   "apiPanel": {
     "title": "API Debug Panel",
