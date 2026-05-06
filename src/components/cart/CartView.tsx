@@ -316,6 +316,7 @@ export function CartView() {
                     unitPrice: item.product?.price ?? 0,
                     quantity: item.quantity,
                   }))}
+                  panelId="cart-ops"
                   onApprove={(orderId) => {
                     setExpressOrder(orderId);
                     router.push(`/${locale}/checkout`);

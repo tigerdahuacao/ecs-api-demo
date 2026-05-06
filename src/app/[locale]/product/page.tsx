@@ -49,26 +49,9 @@ export default function ProductPage() {
        */}
       <ApiPanel
         id="product-add-to-cart"
-        title="商品页 API（加购 / 快捷结账）"
+        title="POST /api/cart · POST /api/paypal/create-order-express"
         defaultPosition="right"
         defaultOpen={false}
-        suggestions={`加购（Add to Cart）：
-1. 使用乐观更新 (Optimistic Update) 立即更新 UI，等待响应后再回滚。
-2. 对相同 sessionId + productId + specs 的加购请求做去重合并，避免创建重复记录。
-3. 加购前可先检查库存 (stock)，避免无效写入。
-
-快捷结账（Express Checkout）：
-1. shipping_preference: "GET_FROM_FILE" 直接从 PayPal 账号读取地址，跳过地址填写步骤。
-2. user_action: "CONTINUE" 在弹窗内只做授权，不立即扣款，在 checkout 页 capture。
-3. 预创建订单（在用户点击前发出请求），避免 Safari transient activation 限制弹窗。`}
-        nextSteps={`加购后：
-1. 更新 Zustand store，触发购物车 Badge 实时刷新。
-2. 将购物车数据同步写入 sessionStorage，以防页面刷新丢失。
-
-快捷结账授权后：
-1. 将 orderId 存入 Zustand payment store，跳转至 checkout 页。
-2. Checkout 页检测到 expressOrderId，显示 "Confirm & Pay" 按钮完成 capture。
-3. Capture 成功后清除 expressOrderId，清空购物车，展示成功状态。`}
       />
     </div>
   );
