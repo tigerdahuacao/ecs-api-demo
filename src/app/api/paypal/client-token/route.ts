@@ -22,6 +22,7 @@
  */
 import { NextResponse } from "next/server";
 import type { ApiResponse } from "@/types";
+import { withLogger } from "@/lib/route-logger";
 
 /** 缓存有效期 10 分钟 / Cache TTL: 10 minutes */
 const CACHE_TTL_MS = 10 * 60 * 1000;
@@ -122,24 +123,18 @@ async function fetchTokenFromPayPal(): Promise<string> {
  *   成功 / Success: { success: true, data: { clientToken: string } }
  *   失败 / Error:   { success: false, error: string } (status 500)
  */
-export async function GET() {
-  try {
-    if (cachedToken && Date.now() - cachedAt < CACHE_TTL_MS) {
-      return NextResponse.json<ApiResponse<{ clientToken: string }>>({
-        success: true,
-        data: { clientToken: cachedToken },
-      });
-    }
-
-    const token = await fetchTokenFromPayPal();
+export const GET = withLogger("[/api/paypal/client-token]", async (_req: Request) => {
+  if (cachedToken && Date.now() - cachedAt < CACHE_TTL_MS) {
+    console.log("cache hit, returning cached token");
     return NextResponse.json<ApiResponse<{ clientToken: string }>>({
       success: true,
-      data: { clientToken: token },
+      data: { clientToken: cachedToken },
     });
-  } catch (err) {
-    return NextResponse.json<ApiResponse<null>>(
-      { success: false, error: String(err) },
-      { status: 500 }
-    );
   }
-}
+
+  const token = await fetchTokenFromPayPal();
+  return NextResponse.json<ApiResponse<{ clientToken: string }>>({
+    success: true,
+    data: { clientToken: token },
+  });
+});
