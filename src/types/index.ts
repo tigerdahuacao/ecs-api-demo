@@ -167,6 +167,10 @@ export interface ApiPanelConfig {
   suggestions?: string;
   /** "下一步"标签页的静态文案 / Static text for the "Next Steps" tab */
   nextSteps?: string;
+  /** Request 标签页的默认内容（无 API 调用时显示）/ Default content for Request tab (shown before any API call) */
+  defaultRequest?: unknown;
+  /** Response 标签页的默认内容（无 API 调用时显示）/ Default content for Response tab (shown before any API call) */
+  defaultResponse?: unknown;
 }
 
 /**
