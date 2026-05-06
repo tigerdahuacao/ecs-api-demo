@@ -56,7 +56,9 @@
     "freeShipping": "免费",
     "total": "应付总额",
     "orderPlaced": "订单已提交",
-    "orderPlacedDesc": "感谢您的购买！"
+    "orderPlacedDesc": "感谢您的购买！",
+    "codDesc": "商品送达时当面付款。请确保收货地址准确，配送员会提前联系您。",
+    "confirmCod": "确认货到付款"
   },
   "apiPanel": {
     "title": "API 调试面板",

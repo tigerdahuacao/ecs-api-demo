@@ -33,7 +33,23 @@ interface PayPalInstance {
   createCardFieldsOneTimePaymentSession?: (options: unknown) => unknown;
 }
 
+/** PayPal Web Component 自定义元素的 JSX 属性 / JSX attributes for PayPal Web Component custom elements */
+interface PayPalButtonElementProps extends React.HTMLAttributes<HTMLElement> {
+  id?: string;
+  type?: string;
+  hidden?: boolean | string;
+  style?: React.CSSProperties;
+}
+
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      /** PayPal Web SDK v6 按钮自定义元素 / PayPal Web SDK v6 button custom element */
+      "paypal-button": PayPalButtonElementProps;
+    }
+  }
+
   interface Window {
     /**
      * PayPal Web SDK v6 注入的对象（SDK script 加载后可用）
