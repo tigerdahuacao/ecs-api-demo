@@ -31,6 +31,7 @@ import { CheckCircle, Package, Truck } from "lucide-react";
 import { apiFetch } from "@/lib/api-client";
 import { getSessionId } from "@/lib/session-storage";
 import { useCartStore } from "@/store/cart";
+import { usePaymentStore } from "@/store/payment";
 import { PaymentWall } from "@/components/checkout/PaymentWall";
 import type { PayPalOrderItem } from "@/components/common/PayPalButton";
 import { ImpulseItem } from "./ImpulseItem";
@@ -50,6 +51,8 @@ export function CheckoutView() {
 
   /** 从 Zustand store 订阅购物车数据 / Subscribe to cart data from Zustand store */
   const { items, setItems, clearCart } = useCartStore();
+  /** 快捷结账状态：non-null 时表示用户已通过 PayPal 快捷按钮授权 / Express checkout: non-null means user pre-authorized via PayPal express button */
+  const { expressOrderId, clearExpressOrder } = usePaymentStore();
 
 
   /** 冲动消费推荐列表 / Impulse-buy recommendation list */
@@ -133,6 +136,37 @@ export function CheckoutView() {
     await new Promise((r) => setTimeout(r, 1200));  // 模拟网络延迟 / Simulate network delay
     setPlaced(true);
     clearCart();  // 清空 Zustand store + sessionStorage / Clear store + sessionStorage
+  };
+
+  /**
+   * handleConfirmAndPay — 快捷结账的最终 capture 步骤
+   * handleConfirmAndPay — final capture step for express checkout shortcut
+   *
+   * 用户已在商品/购物车页面通过 PayPal 弹窗完成授权，
+   * 此处调用 POST /api/paypal/capture-order 完成实际扣款。
+   *
+   * User has already approved via PayPal popup on product/cart page.
+   * This calls POST /api/paypal/capture-order to complete the actual charge.
+   */
+  const handleConfirmAndPay = async () => {
+    if (!expressOrderId) return;
+    setPlacing(true);
+    try {
+      const res = await fetch("/api/paypal/capture-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: expressOrderId }),
+      });
+      const json = await res.json() as { success: boolean; error?: string };
+      if (!json.success) throw new Error(json.error ?? "Capture failed");
+      clearExpressOrder();
+      clearCart();
+      setPlaced(true);
+    } catch (e) {
+      console.error("[Express Checkout] Capture error:", e);
+    } finally {
+      setPlacing(false);
+    }
   };
 
   // ── 加载状态 / Loading state ──────────────────────────────────────────────
@@ -248,40 +282,65 @@ export function CheckoutView() {
                 ¥{subtotal.toFixed(2)}
               </span>
             </div>
-            {/* 支付墙（统一管理所有支付方式）/ Payment wall (manages all payment methods) */}
-            {items.length > 0 && (
-              <PaymentWall
-                currency="USD"
-                amount={subtotal}
-                items={items.map((item): PayPalOrderItem => ({
-                  id: item.productId,
-                  name: item.product
-                    ? (item.product.name as { zh: string; en: string })[locale]
-                    : item.productId,
-                  unitPrice: item.product?.price ?? 0,
-                  quantity: item.quantity,
-                }))}
-                onSuccess={(orderId) => {
-                  setPlaced(true);
-                  clearCart();
-                  console.info("[PayPal] Order captured:", orderId);
-                }}
-                onError={(e) => console.error("[PayPal] Payment error:", e)}
-                onCancel={() => console.info("[PayPal] Payment cancelled")}
-              />
+            {/* ── 快捷结账模式 / Express checkout mode ───────────────────────── */}
+            {expressOrderId ? (
+              <>
+                {/* PayPal 已授权提示 / PayPal pre-authorized notice */}
+                <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl text-sm text-blue-700 dark:text-blue-300">
+                  <svg className="w-4 h-4 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                  </svg>
+                  <p>{t("expressApprovedDesc")}</p>
+                </div>
+                {/* 确认并支付按钮 / Confirm & Pay button */}
+                <button
+                  onClick={handleConfirmAndPay}
+                  disabled={placing}
+                  className="w-full py-3.5 bg-[#ffc439] hover:bg-[#f0b429] text-gray-900 rounded-xl font-bold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {placing ? (
+                    <div className="w-4 h-4 border-2 border-gray-700 border-t-transparent rounded-full animate-spin" />
+                  ) : null}
+                  {t("confirmAndPay")}
+                </button>
+              </>
+            ) : (
+              <>
+                {/* 标准模式：支付墙 + 下单按钮 / Standard mode: payment wall + place order */}
+                {items.length > 0 && (
+                  <PaymentWall
+                    currency="USD"
+                    amount={subtotal}
+                    items={items.map((item): PayPalOrderItem => ({
+                      id: item.productId,
+                      name: item.product
+                        ? (item.product.name as { zh: string; en: string })[locale]
+                        : item.productId,
+                      unitPrice: item.product?.price ?? 0,
+                      quantity: item.quantity,
+                    }))}
+                    onSuccess={(orderId) => {
+                      setPlaced(true);
+                      clearCart();
+                      console.info("[PayPal] Order captured:", orderId);
+                    }}
+                    onError={(e) => console.error("[PayPal] Payment error:", e)}
+                    onCancel={() => console.info("[PayPal] Payment cancelled")}
+                  />
+                )}
+                {/* 下单按钮：购物车为空时禁用 / Place order button: disabled when cart is empty */}
+                <button
+                  onClick={handlePlaceOrder}
+                  disabled={placing || items.length === 0}
+                  className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {placing ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : null}
+                  {t("placeOrder")}
+                </button>
+              </>
             )}
-
-            {/* 下单按钮：购物车为空时禁用 / Place order button: disabled when cart is empty */}
-            <button
-              onClick={handlePlaceOrder}
-              disabled={placing || items.length === 0}
-              className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {placing ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : null}
-              {t("placeOrder")}
-            </button>
           </div>
         </div>
       </div>

@@ -28,10 +28,13 @@
 import { useEffect, useState, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { ShoppingCart, Check, Minus, Plus, Star } from "lucide-react";
 import { apiFetch } from "@/lib/api-client";
 import { getSessionId } from "@/lib/session-storage";
 import { useCartStore } from "@/store/cart";
+import { usePaymentStore } from "@/store/payment";
+import { PayPalExpressButton } from "@/components/common/PayPalExpressButton";
 import type { Product, ApiResponse, CartItem } from "@/types";
 
 /**
@@ -66,6 +69,8 @@ export function ProductDetail() {
 
   /** 从 Zustand store 取加购方法 / Get addItem action from Zustand store */
   const addItem = useCartStore((s) => s.addItem);
+  const setExpressOrder = usePaymentStore((s) => s.setExpressOrder);
+  const router = useRouter();
 
   /** 当前展示的商品（从 API 拉取）/ Currently displayed product (from API) */
   const [product, setProduct] = useState<Product | null>(null);
@@ -370,25 +375,51 @@ export function ProductDetail() {
           }`}
         >
           {added ? (
-            // 成功态：勾 + 提示文字 / Success state: checkmark + text
             <>
               <Check size={18} />
               {t("addedSuccess")}
             </>
           ) : adding ? (
-            // 加载态：spinner + 提示文字 / Loading state: spinner + text
             <>
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               {t("adding")}
             </>
           ) : (
-            // 默认态：购物车图标 + 按钮文字 / Default state: cart icon + text
             <>
               <ShoppingCart size={18} />
               {t("addToCart")}
             </>
           )}
         </button>
+
+        {/* PayPal 快捷结账分隔线 / PayPal express checkout divider */}
+        {product.stock > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+              <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
+                {locale === "zh" ? "或者快捷结账" : "Or express checkout"}
+              </span>
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+            </div>
+            <PayPalExpressButton
+              amount={product.price * quantity}
+              currency="USD"
+              items={[{
+                id: product.id,
+                name: (product.name as { zh: string; en: string })[locale],
+                unitPrice: product.price,
+                quantity,
+              }]}
+              onApprove={(orderId) => {
+                setExpressOrder(orderId);
+                router.push(`/${locale}/checkout`);
+              }}
+              onError={(e) => console.error("[PayPal Express] Error:", e)}
+              onCancel={() => console.info("[PayPal Express] Cancelled")}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

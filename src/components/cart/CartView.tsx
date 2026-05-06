@@ -27,10 +27,13 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
 import { apiFetch } from "@/lib/api-client";
 import { getSessionId } from "@/lib/session-storage";
 import { useCartStore } from "@/store/cart";
+import { usePaymentStore } from "@/store/payment";
+import { PayPalExpressButton } from "@/components/common/PayPalExpressButton";
 import { RecommendationCard } from "./RecommendationCard";
 import type { ApiResponse, CartItem, Recommendation } from "@/types";
 
@@ -49,6 +52,8 @@ export function CartView() {
 
   /** 从 Zustand store 订阅 items 和操作方法 / Subscribe to items and actions from Zustand store */
   const { items, setItems, updateQuantity, removeItem } = useCartStore();
+  const setExpressOrder = usePaymentStore((s) => s.setExpressOrder);
+  const router = useRouter();
 
   /** 推荐商品列表（GET /api/recommendations 响应）/ Recommendation list */
   const [recs, setRecs] = useState<Recommendation[]>([]);
@@ -289,6 +294,37 @@ export function CartView() {
             >
               {t("checkout")}
             </Link>
+
+            {/* PayPal 快捷结账 / PayPal express checkout */}
+            {items.length > 0 && (
+              <div className="space-y-2 mt-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                  <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
+                    {locale === "zh" ? "或者快捷结账" : "Or express checkout"}
+                  </span>
+                  <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                </div>
+                <PayPalExpressButton
+                  amount={total}
+                  currency="USD"
+                  items={items.map((item) => ({
+                    id: item.productId,
+                    name: item.product
+                      ? (item.product.name as { zh: string; en: string })[locale]
+                      : item.productId,
+                    unitPrice: item.product?.price ?? 0,
+                    quantity: item.quantity,
+                  }))}
+                  onApprove={(orderId) => {
+                    setExpressOrder(orderId);
+                    router.push(`/${locale}/checkout`);
+                  }}
+                  onError={(e) => console.error("[PayPal Express] Error:", e)}
+                  onCancel={() => console.info("[PayPal Express] Cancelled")}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
