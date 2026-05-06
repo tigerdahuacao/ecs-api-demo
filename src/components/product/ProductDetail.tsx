@@ -411,6 +411,7 @@ export function ProductDetail() {
                 unitPrice: product.price,
                 quantity,
               }]}
+              panelId="product-add-to-cart"
               onApprove={(orderId) => {
                 setExpressOrder(orderId);
                 router.push(`/${locale}/checkout`);
