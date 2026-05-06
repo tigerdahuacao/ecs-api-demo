@@ -79,6 +79,8 @@ export interface PanelConfig {
   defaultPosition: ApiPanelPosition;
   suggestions?: string;
   nextSteps?: string;
+  defaultRequest?: unknown;
+  defaultResponse?: unknown;
 }
 
 /** 面板默认尺寸（px）/ Default panel size (px) */

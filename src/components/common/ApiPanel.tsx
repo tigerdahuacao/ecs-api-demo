@@ -52,6 +52,8 @@ export function ApiPanel({
   defaultPosition = "right",
   suggestions,
   nextSteps,
+  defaultRequest,
+  defaultResponse,
 }: ApiPanelConfig) {
   const registerPanel = useApiPanelStore((s) => s.registerPanel);
   const unregisterPanel = useApiPanelStore((s) => s.unregisterPanel);
@@ -59,7 +61,7 @@ export function ApiPanel({
   useEffect(() => {
     // 挂载时：将配置写入 Zustand store，ApiPanelProvider 据此渲染 PanelUI
     // On mount: write config to Zustand store; ApiPanelProvider renders PanelUI from it
-    registerPanel({ id, title, defaultPosition: defaultPosition ?? "right", suggestions, nextSteps });
+    registerPanel({ id, title, defaultPosition: defaultPosition ?? "right", suggestions, nextSteps, defaultRequest, defaultResponse });
 
     // 卸载时：路由切换时从 store 移除配置，ApiPanelProvider 停止渲染该面板
     // On unmount (route change): remove config from store; ApiPanelProvider stops rendering this panel

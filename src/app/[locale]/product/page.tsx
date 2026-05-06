@@ -52,6 +52,21 @@ export default function ProductPage() {
         title="POST /api/cart · POST /api/paypal/create-order-express"
         defaultPosition="right"
         defaultOpen={false}
+        defaultRequest={{
+          method: "POST",
+          url: "/api/cart  |  /api/paypal/create-order-express",
+          body: {
+            sessionId: "<session-id>",
+            productId: "<product-id>",
+            quantity: 1,
+            specs: { color: "teal", size: "medium" },
+          },
+        }}
+        defaultResponse={{
+          status: 200,
+          ok: true,
+          data: { "...": "点击「加入购物车」或「PayPal 快捷结账」后显示实际响应" },
+        }}
       />
     </div>
   );

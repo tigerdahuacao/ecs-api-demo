@@ -46,6 +46,23 @@ export default function CartPage() {
         title="GET /api/cart · PATCH · DELETE · POST /api/paypal/create-order-express"
         defaultPosition="bottom"
         defaultOpen={false}
+        defaultRequest={{
+          method: "GET",
+          url: "/api/cart?sessionId=<session-id>",
+        }}
+        defaultResponse={{
+          status: 200,
+          ok: true,
+          data: [
+            {
+              id: "<cart-item-id>",
+              productId: "<product-id>",
+              quantity: 1,
+              specs: { color: "teal", size: "medium" },
+              product: { name: { zh: "青釉马克杯", en: "Celadon Mug" }, price: 89 },
+            },
+          ],
+        }}
       />
     </div>
   );

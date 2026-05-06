@@ -200,10 +200,15 @@ function PanelUI({ id }: { id: string }) {
         </pre>
       );
     }
-    const raw = activeTab === "request" ? entry?.request : entry?.response;
-    if (!raw) return <p className="text-xs text-gray-500 italic">{t("noData")}</p>;
+    const raw = activeTab === "request"
+      ? (entry?.request ?? config.defaultRequest)
+      : (entry?.response ?? config.defaultResponse);
+    const isDefault = raw !== undefined && (
+      activeTab === "request" ? entry?.request === undefined : entry?.response === undefined
+    );
+    if (raw === undefined) return <p className="text-xs text-gray-500 italic">{t("noData")}</p>;
     return (
-      <pre className="text-xs font-mono leading-relaxed text-green-400 whitespace-pre">
+      <pre className={`text-xs font-mono leading-relaxed whitespace-pre ${isDefault ? "text-gray-500" : "text-green-400"}`}>
         {JSON.stringify(raw, null, 2)}
       </pre>
     );
