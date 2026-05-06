@@ -56,7 +56,9 @@
     "freeShipping": "Free",
     "total": "Total",
     "orderPlaced": "Order Placed",
-    "orderPlacedDesc": "Thank you for your purchase!"
+    "orderPlacedDesc": "Thank you for your purchase!",
+    "codDesc": "Pay when your order arrives. Make sure your delivery address is correct — our courier will contact you beforehand.",
+    "confirmCod": "Confirm Cash on Delivery"
   },
   "apiPanel": {
     "title": "API Debug Panel",

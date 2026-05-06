@@ -42,15 +42,17 @@ import { loadPayPalSdk, isPayPalSdkLoaded } from "@/lib/paypal/sdk";
  *   - loading: boolean — SDK 正在加载中 / SDK is loading
  *   - error: Error | null — 加载失败的错误对象 / error if loading failed
  */
-export function usePayPalSdk() {
-  const [ready, setReady] = useState<boolean>(isPayPalSdkLoaded());
-  const [loading, setLoading] = useState<boolean>(!isPayPalSdkLoaded());
+export  function  usePayPalSdk() {
+  const alreadyLoaded = isPayPalSdkLoaded();
+  const [ready, setReady] = useState<boolean>(alreadyLoaded);
+  const [loading, setLoading] = useState<boolean>(!alreadyLoaded);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    // SDK 已加载时跳过，避免重复请求 / Skip if SDK already loaded to avoid redundant calls
+    if (isPayPalSdkLoaded()) return;
+
     let cancelled = false;
-    setLoading(true);
-    setError(null);
 
     loadPayPalSdk()
       .then(() => {

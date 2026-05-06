@@ -31,7 +31,8 @@ import { CheckCircle, Package, Truck } from "lucide-react";
 import { apiFetch } from "@/lib/api-client";
 import { getSessionId } from "@/lib/session-storage";
 import { useCartStore } from "@/store/cart";
-import { usePayPalSdk } from "@/hooks/usePayPalSdk";
+import { PaymentWall } from "@/components/checkout/PaymentWall";
+import type { PayPalOrderItem } from "@/components/common/PayPalButton";
 import { ImpulseItem } from "./ImpulseItem";
 import type { ApiResponse, CartItem, Recommendation } from "@/types";
 
@@ -50,13 +51,6 @@ export function CheckoutView() {
   /** 从 Zustand store 订阅购物车数据 / Subscribe to cart data from Zustand store */
   const { items, setItems, clearCart } = useCartStore();
 
-  /**
-   * 加载 PayPal SDK（第一步：仅加载，暂不显示支付 UI）
-   * Load PayPal SDK (step 1: load only, no payment UI yet)
-   * SDK 加载后 window.paypal 可用，后续步骤将调用 createInstance()
-   * After loading, window.paypal is available; next steps will call createInstance()
-   */
-  const { ready: paypalReady } = usePayPalSdk();
 
   /** 冲动消费推荐列表 / Impulse-buy recommendation list */
   const [recs, setRecs] = useState<Recommendation[]>([]);
@@ -111,23 +105,6 @@ export function CheckoutView() {
     fetchData(); // eslint-disable-line react-hooks/set-state-in-effect
   }, [fetchData]);
 
-  // PayPal SDK 就绪后获取 clientToken（验证阶段：仅 console 输出）
-  // After PayPal SDK is ready, fetch clientToken (verification phase: console only)
-  useEffect(() => {
-    if (!paypalReady) return;
-    apiFetch<ApiResponse<{ clientToken: string }>>("/api/paypal/client-token")
-      .then((res) => {
-        if (res.success && res.data) {
-          // TODO（第二步）：调用 window.paypal.createInstance({ clientToken: res.data.clientToken })
-          // TODO (step 2): call window.paypal.createInstance({ clientToken: res.data.clientToken })
-          console.log("[PayPal] SDK ready, clientToken obtained:", res.data.clientToken.slice(0, 20) + "…");
-        }
-      })
-      .catch(() => {
-        // 未配置 PayPal 凭据时静默忽略（mock 模式下正常）
-        // Silently ignore when PayPal credentials are not configured (normal in mock mode)
-      });
-  }, [paypalReady]);
 
   /** 本地计算小计 / Locally computed subtotal */
   const subtotal = items.reduce(
@@ -271,6 +248,29 @@ export function CheckoutView() {
                 ¥{subtotal.toFixed(2)}
               </span>
             </div>
+            {/* 支付墙（统一管理所有支付方式）/ Payment wall (manages all payment methods) */}
+            {items.length > 0 && (
+              <PaymentWall
+                currency="USD"
+                amount={subtotal}
+                items={items.map((item): PayPalOrderItem => ({
+                  id: item.productId,
+                  name: item.product
+                    ? (item.product.name as { zh: string; en: string })[locale]
+                    : item.productId,
+                  unitPrice: item.product?.price ?? 0,
+                  quantity: item.quantity,
+                }))}
+                onSuccess={(orderId) => {
+                  setPlaced(true);
+                  clearCart();
+                  console.info("[PayPal] Order captured:", orderId);
+                }}
+                onError={(e) => console.error("[PayPal] Payment error:", e)}
+                onCancel={() => console.info("[PayPal] Payment cancelled")}
+              />
+            )}
+
             {/* 下单按钮：购物车为空时禁用 / Place order button: disabled when cart is empty */}
             <button
               onClick={handlePlaceOrder}
