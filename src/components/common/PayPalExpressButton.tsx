@@ -202,13 +202,13 @@ export function PayPalExpressButton({
         btn.removeAttribute("hidden");
         if (!cancelled) onReady?.();
 
-        // 预创建订单 Promise（在 click 前就发出请求，避免 transient activation 限制）
-        // Pre-create order Promise before click to avoid browser popup blocking on async ops
-        const orderPromise = createExpressOrder(amount, currency, items);
-
         btn.addEventListener("click", async () => {
-          // 用户点击时，把已完成（或正在进行中）的请求数据写入 ApiPanel
-          // On user click, flush the pre-created order request+response into the ApiPanel
+          // 用户点击时才发出创建订单请求，确保 ApiPanel 日志时序正确
+          // Create order on click so ApiPanel log timestamp matches user action
+          const orderPromise = createExpressOrder(amount, currency, items);
+
+          // 订单请求完成后写入 ApiPanel（Promise 解析后，SDK popup 已打开）
+          // Write to ApiPanel after order resolves (SDK popup is already open by then)
           if (panelId) {
             orderPromise.then((resolved) => {
               if (cancelled) return;
@@ -217,10 +217,10 @@ export function PayPalExpressButton({
               if (!store.instances[panelId]?.isOpen) {
                 store.setOpen(panelId, true);
               }
-            }).catch(() => { /* error handled below */ });
+            }).catch(() => { /* error surfaced via onError below */ });
           }
+
           try {
-            // SDK 的 start() 只需要 { orderId } 部分，map the Promise shape
             await paymentSession.start(
               { presentationMode: "auto" },
               orderPromise.then((r) => ({ orderId: r.orderId }))
