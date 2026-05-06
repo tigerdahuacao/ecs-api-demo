@@ -270,7 +270,7 @@ export function PayPalButton({
   if (loading) {
     return (
       <div
-        className="w-full flex items-center justify-center bg-[#ffc439] rounded-lg animate-pulse"
+        className="w-full flex items-center justify-center bg-[#ffc439] rounded-xl animate-pulse"
         style={{ minHeight }}
         aria-label="Loading PayPal"
       >
@@ -283,7 +283,7 @@ export function PayPalButton({
   if (sdkError) {
     return (
       <div
-        className="w-full flex items-center justify-center bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-xs"
+        className="w-full flex items-center justify-center bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-xs"
         style={{ minHeight }}
       >
         PayPal 加载失败 / SDK load failed
@@ -293,9 +293,11 @@ export function PayPalButton({
 
   // ── 正常渲染 / Normal render ───────────────────────────────────────────────
   return (
-    <div className="w-full" style={{ minHeight }}>
-      {/* PayPal Web SDK v6 自定义元素，hidden 属性由 effect 移除 */}
-      {/* PayPal Web SDK v6 custom element; hidden attribute is removed by effect */}
+    // overflow-hidden + rounded-xl 裁掉 Web Component 的默认直角
+    // overflow-hidden + rounded-xl clips the Web Component's default square corners
+
+    // 觉得圆角太大或太小，改 rounded-xl 为其他值（rounded-lg / rounded-2xl）
+    <div className="w-full rounded-xl overflow-hidden" style={{ minHeight }}>
       {/* @ts-expect-error paypal-button is a custom element registered by the SDK */}
       <paypal-button
         id={btnId}

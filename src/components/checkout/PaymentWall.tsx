@@ -129,6 +129,27 @@ export interface PaymentMethodComponentProps {
  *
  * PayPalButton 完成 SDK init + 按钮显示后调用 onReady，
  * PaymentWall 收到后解除 tab 禁用状态。
+ *
+ * 为什么用 memo？
+ * PaymentWall 内部有状态（activeId、isCurrentReady），任何状态变化都会触发自身重新渲染。
+ * 如果不加 memo，PayPalButton 会跟着重新渲染，useEffect 依赖数组检测到变化后
+ * 会重新执行初始化流程（重新 createInstance、重新绑定 click 事件），影响支付流程。
+ * memo 让 PayPalButton 在 props 未变时跳过重新渲染，保持 SDK 实例稳定。
+ *
+ * 注意：memo 只在"组件已存在、父组件重新渲染"时生效。
+ * 用户离开 checkout 页面再回来，组件整体卸载重挂载，memo 无法介入，此时必然重建实例。
+ * （但 PayPal script 标签是单例，不会重复加载）
+ *
+ * Why memo?
+ * PaymentWall has internal state (activeId, isCurrentReady). Any state change re-renders it.
+ * Without memo, PayPalButton would re-render too, triggering its useEffect to re-run
+ * (re-createInstance, re-bind click), disrupting the payment flow.
+ * memo skips re-render when props are unchanged, keeping the SDK instance stable.
+ *
+ * Note: memo only helps when the component already exists and its parent re-renders.
+ * Navigating away and back causes a full unmount/remount — memo cannot intervene,
+ * so the SDK instance is always rebuilt on re-entry. (The PayPal script tag itself
+ * is a singleton and is never reloaded.)
  */
 const PayPalMethodWrapper = memo(function PayPalMethodWrapper({
   amount,
