@@ -33,6 +33,8 @@
 
 import { useEffect, useRef, useId } from "react";
 import { usePayPalSdk } from "@/hooks/usePayPalSdk";
+import { useApiPanelStore } from "@/store/api-panel";
+import type { PanelDataEntry } from "@/store/api-panel";
 import type { PayPalOrderItem } from "./PayPalButton";
 
 // ── 类型 / Types ──────────────────────────────────────────────────────────────
@@ -65,6 +67,15 @@ export interface PayPalExpressButtonProps {
   onError?: (error: unknown) => void;
   /** 用户取消回调 / Called when user cancels */
   onCancel?: () => void;
+  /**
+   * ApiPanel 面板 ID（可选）
+   * 指定后，用户点击按钮时将 create-order-express 的请求体和响应写入该面板并自动展开。
+   *
+   * Optional ApiPanel ID.
+   * When specified, clicking the button writes the create-order-express request+response
+   * to that panel and auto-opens it — so the request body is visible in the debug panel.
+   */
+  panelId?: string;
 }
 
 // ── 辅助函数 / Helpers ─────────────────────────────────────────────────────
@@ -78,21 +89,36 @@ async function fetchClientToken(): Promise<string> {
   return json.data.clientToken;
 }
 
+/**
+ * createExpressOrder — 调用后端创建 express 订单，同时返回面板展示所需的数据条目
+ * createExpressOrder — calls backend to create an express order; also returns a panel data entry
+ *
+ * 返回值额外包含 panelEntry，供调用方在用户点击时写入 ApiPanel。
+ * Returns a panelEntry alongside orderId so the caller can write it to ApiPanel on user click.
+ */
 async function createExpressOrder(
   amount: number,
   currency: string,
   items: PayPalOrderItem[]
-): Promise<{ orderId: string }> {
+): Promise<{ orderId: string; panelEntry: PanelDataEntry }> {
+  const requestBody = { totalAmount: amount, currency, items };
   const res = await fetch("/api/paypal/create-order-express", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ totalAmount: amount, currency, items }),
+    body: JSON.stringify(requestBody),
   });
   const json = await res.json() as { success: boolean; data?: { orderId: string }; error?: string };
+
+  const panelEntry: PanelDataEntry = {
+    request: { method: "POST", url: "/api/paypal/create-order-express", body: requestBody },
+    response: { status: res.status, ok: res.ok, data: json },
+    timestamp: Date.now(),
+  };
+
   if (!json.success || !json.data?.orderId) {
     throw new Error(json.error ?? "Failed to create express PayPal order");
   }
-  return { orderId: json.data.orderId };
+  return { orderId: json.data.orderId, panelEntry };
 }
 
 // ── 组件 / Component ───────────────────────────────────────────────────────
@@ -113,6 +139,7 @@ export function PayPalExpressButton({
   onApprove,
   onError,
   onCancel,
+  panelId,
 }: PayPalExpressButtonProps) {
   const { ready, loading, error: sdkError } = usePayPalSdk();
 
@@ -175,11 +202,29 @@ export function PayPalExpressButton({
         btn.removeAttribute("hidden");
         if (!cancelled) onReady?.();
 
+        // 预创建订单 Promise（在 click 前就发出请求，避免 transient activation 限制）
+        // Pre-create order Promise before click to avoid browser popup blocking on async ops
         const orderPromise = createExpressOrder(amount, currency, items);
 
         btn.addEventListener("click", async () => {
+          // 用户点击时，把已完成（或正在进行中）的请求数据写入 ApiPanel
+          // On user click, flush the pre-created order request+response into the ApiPanel
+          if (panelId) {
+            orderPromise.then((resolved) => {
+              if (cancelled) return;
+              const store = useApiPanelStore.getState();
+              store.setEntry(panelId, resolved.panelEntry);
+              if (!store.instances[panelId]?.isOpen) {
+                store.setOpen(panelId, true);
+              }
+            }).catch(() => { /* error handled below */ });
+          }
           try {
-            await paymentSession.start({ presentationMode: "auto" }, orderPromise);
+            // SDK 的 start() 只需要 { orderId } 部分，map the Promise shape
+            await paymentSession.start(
+              { presentationMode: "auto" },
+              orderPromise.then((r) => ({ orderId: r.orderId }))
+            );
           } catch (e) {
             if (!cancelled) onError?.(e);
           }
@@ -194,7 +239,7 @@ export function PayPalExpressButton({
       sdkInstanceRef.current?.destroy?.();
       sdkInstanceRef.current = null;
     };
-  }, [ready, amount, currency, items, btnId, onApprove, onError, onCancel, onReady]);
+  }, [ready, amount, currency, items, btnId, panelId, onApprove, onError, onCancel, onReady]);
 
   if (loading) {
     return (
