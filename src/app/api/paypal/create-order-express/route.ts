@@ -1,14 +1,14 @@
 /**
  * @file src/app/api/paypal/create-order-express/route.ts
- * POST /api/paypal/create-order-express — 创建 PayPal Express Checkout 订单
- * POST /api/paypal/create-order-express — Create a PayPal Express Checkout (shortcut) order
+ * POST /api/paypal/create-order-express �?创建 PayPal Express Checkout 订单
+ * POST /api/paypal/create-order-express �?Create a PayPal Express Checkout (shortcut) order
  *
- * 与标准 create-order 的区别 / Differences from standard create-order:
- *   - shipping_preference: "GET_FROM_FILE" — 从买家 PayPal 账户获取收货地址
- *   - user_action: "CONTINUE" — 授权后返回商家网站，不立即扣款
+ * 与标�?create-order 的区�?/ Differences from standard create-order:
+ *   - shipping_preference: "GET_FROM_FILE" �?从买�?PayPal 账户获取收货地址
+ *   - user_action: "CONTINUE" �?授权后返回商家网站，不立即扣�?
  *
  * 被引用于 / Called by:
- *   src/components/common/PayPalExpressButton.tsx → createExpressOrder()
+ *   src/components/common/PayPalExpressButton.tsx �?createExpressOrder()
  */
 import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse } from "@/types";
@@ -61,7 +61,7 @@ export const POST = withLogger("[/api/paypal/create-order-express]", async (req:
   const items: OrderItem[] = Array.isArray(body.items) ? body.items : [];
   const totalAmount = Number(body.totalAmount ?? 0);
   const currency = String(body.currency ?? "USD").toUpperCase();
-  console.log("[1]request body:", JSON.stringify(body, null, 2));
+  console.log("request body:", JSON.stringify(body, null, 2));
 
   if (items.length === 0 || totalAmount <= 0) {
     return NextResponse.json<ApiResponse<null>>(
@@ -104,7 +104,7 @@ export const POST = withLogger("[/api/paypal/create-order-express]", async (req:
 
   const url = `${getPayPalApiBase()}/v2/checkout/orders`;
   console.log("calling PayPal:", url);
-  console.log("[2]order body:", JSON.stringify(orderBody, null, 2));
+  console.log("order body:", JSON.stringify(orderBody, null, 2));
 
   const createRes = await fetch(url, {
     method: "POST",
