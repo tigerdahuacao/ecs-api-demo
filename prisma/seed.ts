@@ -32,8 +32,8 @@ async function main() {
         },
         price: 89.0,
         images: [
-          "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=800",
-          "https://images.unsplash.com/photo-1576020799627-aeac74d58064?w=800",
+          "/products/mug-1.jpg",
+          "/products/mug-2.jpg",
         ],
         category: "mug",
         specs: [
@@ -69,7 +69,7 @@ async function main() {
         },
         price: 65.0,
         images: [
-          "https://images.unsplash.com/photo-1589119926498-f5bcd7af1d86?w=800",
+          "/products/mug-3.jpg",
         ],
         category: "mug",
         specs: [
@@ -102,7 +102,7 @@ async function main() {
         },
         price: 128.0,
         images: [
-          "https://images.unsplash.com/photo-1544737759-4e91a7a9f7f9?w=800",
+          "/products/mug-4.jpg",
         ],
         category: "teacup",
         specs: [
@@ -128,7 +128,7 @@ async function main() {
         },
         price: 99.0,
         images: [
-          "https://images.unsplash.com/photo-1614803745124-20b0e5ade2ea?w=800",
+          "/products/mug-5.jpg",
         ],
         category: "tumbler",
         specs: [
@@ -153,7 +153,7 @@ async function main() {
         },
         price: 149.0,
         images: [
-          "https://images.unsplash.com/photo-1498804103079-a6351b050096?w=800",
+          "/products/mug-6.jpg",
         ],
         category: "travel",
         specs: [
