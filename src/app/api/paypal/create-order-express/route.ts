@@ -61,7 +61,7 @@ export const POST = withLogger("[/api/paypal/create-order-express]", async (req:
   const items: OrderItem[] = Array.isArray(body.items) ? body.items : [];
   const totalAmount = Number(body.totalAmount ?? 0);
   const currency = String(body.currency ?? "USD").toUpperCase();
-  console.log("request body:", JSON.stringify(body, null, 2));
+  console.log("[1]request body:", JSON.stringify(body, null, 2));
 
   if (items.length === 0 || totalAmount <= 0) {
     return NextResponse.json<ApiResponse<null>>(
@@ -104,7 +104,7 @@ export const POST = withLogger("[/api/paypal/create-order-express]", async (req:
 
   const url = `${getPayPalApiBase()}/v2/checkout/orders`;
   console.log("calling PayPal:", url);
-  console.log("order body:", JSON.stringify(orderBody, null, 2));
+  console.log("[2]order body:", JSON.stringify(orderBody, null, 2));
 
   const createRes = await fetch(url, {
     method: "POST",
