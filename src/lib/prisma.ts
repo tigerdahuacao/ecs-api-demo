@@ -23,8 +23,8 @@
  *   Prisma 5 type generation compatibility issues in certain build setups.
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
 /**
  * 在 globalThis 上声明一个可选的 prisma 属性，用于跨 HMR 保持单例
@@ -33,22 +33,19 @@ const { PrismaClient } = require("@prisma/client");
 const globalForPrisma = globalThis as unknown as { prisma?: any };
 
 /**
- * prisma — 全局唯一的 Prisma 客户端实例
- * prisma — the globally unique Prisma client instance
+ * prisma — 全局唯一的 Prisma 客户端实例（通过 Accelerate 代理）
+ * prisma — the globally unique Prisma client instance (via Accelerate proxy)
  *
- * 逻辑 / Logic:
- *   - 若 globalThis.prisma 已存在（即 HMR 重载后），直接复用
- *   - 否则创建新实例并挂载到 globalThis
- *   - If globalThis.prisma already exists (after HMR reload), reuse it
- *   - Otherwise create a new instance and attach to globalThis
+ * withAccelerate() 使 Prisma 通过 Accelerate 连接，兼容 Edge Runtime，
+ * 同时支持 Cloudflare Pages 和 Vercel 部署。
+ * withAccelerate() routes connections through Accelerate, making Prisma
+ * compatible with Edge Runtime — works on both Cloudflare Pages and Vercel.
  */
 export const prisma: any =
   globalForPrisma.prisma ??
   new PrismaClient({
-    // 开发环境只记录错误日志，避免控制台输出过多查询日志
-    // In dev, only log errors to avoid flooding the console with query logs
     log: process.env.NODE_ENV === "development" ? ["error"] : [],
-  });
+  }).$extends(withAccelerate());
 
 // 非生产环境下将实例挂载到 global，使 HMR 重载后可复用
 // In non-production, attach to global so HMR reloads can reuse the instance
