@@ -16,6 +16,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { MOCK_PRODUCTS, mockCart, isMock } from "@/lib/mock-data";
 import type { ApiResponse, CartItem } from "@/types";
 
+export const runtime = 'edge';
+
 /**
  * GET /api/cart?sessionId=xxx — 返回指定会话的购物车条目（含关联商品信息）
  * GET /api/cart?sessionId=xxx — return cart items for a session (with product info)

@@ -22,6 +22,8 @@
 import { ProductDetail } from "@/components/product/ProductDetail";
 import { ApiPanel } from "@/components/common/ApiPanel";
 
+export const runtime = 'edge';
+
 /**
  * ProductPage — 商品详情页
  * ProductPage — product detail page

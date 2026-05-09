@@ -26,6 +26,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { MOCK_RECOMMENDATIONS, isMock } from "@/lib/mock-data";
 import type { ApiResponse, Recommendation } from "@/types";
 
+export const runtime = 'edge';
+
 /**
  * GET — 返回指定商品的推荐列表
  * GET — return recommendations for a specific product

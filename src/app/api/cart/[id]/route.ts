@@ -14,6 +14,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { mockCart, isMock } from "@/lib/mock-data";
 import type { ApiResponse, CartItem } from "@/types";
 
+export const runtime = 'edge';
+
 /**
  * PATCH /api/cart/:id — 更新指定购物车条目的数量
  * PATCH /api/cart/:id — update quantity for a specific cart item

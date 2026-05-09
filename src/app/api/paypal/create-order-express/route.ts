@@ -14,6 +14,8 @@ import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse } from "@/types";
 import { withLogger } from "@/lib/route-logger";
 
+export const runtime = 'edge';
+
 type OrderItem = {
   id?: string;
   name: string;

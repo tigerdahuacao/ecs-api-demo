@@ -24,6 +24,8 @@
 import { CheckoutView } from "@/components/checkout/CheckoutView";
 import { ApiPanel } from "@/components/common/ApiPanel";
 
+export const runtime = 'edge';
+
 /**
  * CheckoutPage — 结算页
  * CheckoutPage — checkout page

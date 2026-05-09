@@ -26,6 +26,8 @@
 import { CartView } from "@/components/cart/CartView";
 import { ApiPanel } from "@/components/common/ApiPanel";
 
+export const runtime = 'edge';
+
 /**
  * CartPage — 购物车页
  * CartPage — cart page

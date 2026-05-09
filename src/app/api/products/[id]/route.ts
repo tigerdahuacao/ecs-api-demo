@@ -28,6 +28,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { MOCK_PRODUCTS, isMock } from "@/lib/mock-data";
 import type { ApiResponse, Product } from "@/types";
 
+export const runtime = 'edge';
+
 /**
  * GET — 根据 ID 返回单个商品
  * GET — return a single product by ID

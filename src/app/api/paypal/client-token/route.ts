@@ -24,6 +24,8 @@ import { NextResponse } from "next/server";
 import type { ApiResponse } from "@/types";
 import { withLogger } from "@/lib/route-logger";
 
+export const runtime = 'edge';
+
 /** 缓存有效期 10 分钟 / Cache TTL: 10 minutes */
 const CACHE_TTL_MS = 10 * 60 * 1000;
 

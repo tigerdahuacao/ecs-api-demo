@@ -23,7 +23,7 @@
  *   Prisma 5 type generation compatibility issues in certain build setups.
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
 /**

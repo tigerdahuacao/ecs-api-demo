@@ -12,6 +12,8 @@
  */
 import { redirect } from "next/navigation";
 
+export const runtime = 'edge';
+
 interface Props {
   /** Next.js 动态路由参数（Promise，因为 App Router 异步化了 params）
    *  Next.js dynamic route params (Promise because App Router made params async) */

@@ -24,6 +24,8 @@ import { NextResponse } from "next/server";
 import { MOCK_PRODUCTS, isMock } from "@/lib/mock-data";
 import type { ApiResponse, Product } from "@/types";
 
+export const runtime = 'edge';
+
 /**
  * GET — 返回所有商品列表
  * GET — return all products
